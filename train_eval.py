@@ -1,7 +1,7 @@
 import torch
 from ogb.nodeproppred import PygNodePropPredDataset
 from tqdm import tqdm
-from torch_geometric.loader import RandomNodeLoader, GraphSAINTNodeSampler
+from torch_geometric.loader import RandomNodeLoader
 from torch_geometric.utils import scatter
 from model_sparse import GumbelGCN
 from model_normal import NormalGCN
@@ -11,7 +11,6 @@ torch.manual_seed(0)
 def train_eval(
     data_dir='./data', 
     mode='sparse',
-    node_sampler='GraphSAINT',
     train_parts=100, 
     val_parts=25, 
     test_parts=25, 
@@ -19,7 +18,7 @@ def train_eval(
     lr=1e-3, 
     weight_decay=5e-4, 
     temperature=0.05, 
-    device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
+    device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), 
     hidden1=16, 
     hidden2=16,
     k=5,
@@ -27,7 +26,7 @@ def train_eval(
     output_dim=112,
     edge_feature_dim=8,
     ):
-        
+    
     # Load the dataset
     dataset = PygNodePropPredDataset('ogbn-proteins', root=data_dir)
     splitted_idx = dataset.get_idx_split()
@@ -53,26 +52,27 @@ def train_eval(
     data['test_mask'] = mask
 
     # Create data loaders
-    if node_sampler == 'GraphSAINT':
-        train_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//train_parts)
-        val_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//val_parts)
-        test_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//test_parts)
-    else:
-        train_loader = RandomNodeLoader(data, num_parts=train_parts, shuffle=True)
-        val_loader = RandomNodeLoader(data, num_parts=val_parts, shuffle=False)
-        test_loader = RandomNodeLoader(data, num_parts=test_parts, shuffle=False)
-        
+    train_loader = RandomNodeLoader(data, num_parts=train_parts, shuffle=True)
+    val_loader = RandomNodeLoader(data, num_parts=val_parts, shuffle=False)
+    test_loader = RandomNodeLoader(data, num_parts=test_parts, shuffle=False)
+
     # Initialize the model
     if mode == 'sparse':
-        model = GumbelGCN(input_dim, output_dim, edge_feature_dim, k, hidden1, hidden2, temperature).to(device)
+        model = GumbelGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
     else:
-        model = NormalGCN(input_dim, output_dim, edge_feature_dim, k, hidden1, hidden2, temperature).to(device)
+        model = NormalGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
 
     # Set up the optimizer with weight decay for the first convolutional layer
     optimizer = torch.optim.Adam([
     {'params': model.conv.conv1.parameters(), 'weight_decay': weight_decay},
     {'params': [p for n, p in model.named_parameters() if 'conv.conv1' not in n], 'weight_decay': 0}
     ], lr)
+
+    # Save path
+    if mode == 'sparse':
+        save_path = './sparse_wts/'
+    else:
+        save_path = './normal_wts/'
 
     # Define the loss function
     criterion = torch.nn.BCEWithLogitsLoss()
@@ -157,13 +157,13 @@ def train_eval(
 
         pbar.close()
 
-        torch.save(model.state_dict(), 'curr_model.pth')
+        torch.save(model.state_dict(), save_path + 'curr_model.pth')
 
         # Early stopping
         if val_total > best_val:
             best_val = val_total
             patience_counter = 0
-            torch.save(model.state_dict(), 'best_model.pth')
+            torch.save(model.state_dict(), save_path + 'best_model.pth')
 
         else:
             patience_counter += 1
@@ -175,7 +175,16 @@ def train_eval(
         torch.cuda.empty_cache()
         print()
 
+    del model
+
     # Test the model
+    if mode == 'sparse':
+        model = GumbelGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
+    else:
+        model = NormalGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
+
+    model.load_state_dict(torch.load(save_path + 'best_model.pth'))
+    model.to(device)
     model.eval()
     pbar = tqdm(total=len(test_loader))
     pbar.set_description(f'Testing')
