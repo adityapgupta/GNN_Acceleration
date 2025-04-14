@@ -54,9 +54,9 @@ def train_eval(
 
     # Create data loaders
     if node_sampler == 'GraphSAINT':
-        train_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//train_parts)
-        val_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//val_parts)
-        test_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//test_parts)
+        train_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//train_parts, num_steps=train_parts)
+        val_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//val_parts, num_steps=val_parts)
+        test_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//test_parts, num_steps=test_parts)
     else:
         train_loader = RandomNodeLoader(data, num_parts=train_parts, shuffle=True)
         val_loader = RandomNodeLoader(data, num_parts=val_parts, shuffle=False)
@@ -76,9 +76,9 @@ def train_eval(
 
     # Save path
     if mode == 'sparse':
-        save_path = '.models/sparse_wts/'
+        save_path = './models/sparse_wts/'
     else:
-        save_path = '.models/normal_wts/'
+        save_path = './models/normal_wts/'
 
     # Define the loss function
     criterion = torch.nn.BCEWithLogitsLoss()
