@@ -7,8 +7,8 @@ from train_eval import train_eval
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, default='./data', help='Directory for the dataset')
-    parser.add_argument('--mode', type=str, default='normal', help='sparse or normal')
-    parser.add_argument('--node_sampler', type=str, default='GraphSAINT', help='Node sampler')
+    parser.add_argument('--mode', type=str, default='normal', help='Sparsification mode: normal, dropedge, sparse')
+    parser.add_argument('--node_sampler', type=str, default='random', help='Sampling method: random, graphsage, graphsaint')
     parser.add_argument('--train_parts', type=int, default=100, help='Number of training parts')
     parser.add_argument('--val_parts', type=int, default=25, help='Number of validation parts')
     parser.add_argument('--test_parts', type=int, default=25, help='Number of test parts')
@@ -23,6 +23,7 @@ if __name__ == "__main__":
     parser.add_argument('--input_dim', type=int, default=8, help='Input dimension')
     parser.add_argument('--output_dim', type=int, default=112, help='Output dimension')
     parser.add_argument('--edge_feature_dim', type=int, default=8, help='Edge feature dimension')
+    parser.add_argument('--dropout_ratio', type=float, default=0.2, help='Dropout ratio')
 
     args = parser.parse_args()
     data_dir = args.data_dir
@@ -42,5 +43,25 @@ if __name__ == "__main__":
     input_dim = args.input_dim
     output_dim = args.output_dim
     edge_feature_dim = args.edge_feature_dim
+    dropout_ratio = args.dropout_ratio
 
-    train_eval(data_dir, mode, node_sampler, train_parts, val_parts, test_parts, epochs, lr, weight_decay, temperature, device, hidden1, hidden2, k, input_dim, output_dim, edge_feature_dim)
+    train_eval(
+        data_dir, 
+        mode, 
+        node_sampler, 
+        train_parts, 
+        val_parts, 
+        test_parts, 
+        epochs, 
+        lr, 
+        weight_decay, 
+        temperature, 
+        device, 
+        hidden1, 
+        hidden2, 
+        k, 
+        input_dim, 
+        output_dim, 
+        edge_feature_dim, 
+        dropout_ratio
+    )

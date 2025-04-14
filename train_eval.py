@@ -6,18 +6,20 @@ from sklearn.metrics import roc_auc_score
 from ogb.nodeproppred import PygNodePropPredDataset
 
 from torch_geometric.utils import scatter
+from torch_geometric.utils.dropout import dropout_edge
 from torch_geometric.loader import GraphSAINTNodeSampler, NeighborLoader, RandomNodeLoader
 
-from model_sparse import GumbelGCN
 from model_normal import NormalGCN
+from model_dropedge import DropoutGCN
+from model_sparse import GumbelGCN
 
 torch.manual_seed(0)
 
 
 def train_eval(
     data_dir='./data', 
-    mode='sparse',
-    node_sampler='GraphSAINT',
+    mode='normal',
+    node_sampler='random',
     train_parts=100, 
     val_parts=25, 
     test_parts=25, 
@@ -32,6 +34,7 @@ def train_eval(
     input_dim=8,
     output_dim=112,
     edge_feature_dim=8,
+    dropout_ratio=0.2,
     ):
     
     # Load the dataset
@@ -59,21 +62,23 @@ def train_eval(
     data['test_mask'] = mask
 
     # Create data loaders
-    if node_sampler == 'GraphSAINT':
-        train_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//train_parts, num_steps=train_parts)
-        val_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//val_parts, num_steps=val_parts)
-        test_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//test_parts, num_steps=test_parts)
-    elif node_sampler == 'GraphSage':
+    if node_sampler == 'graphsage':
         train_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//train_parts, input_nodes=splitted_idx["train"])
         val_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//val_parts, input_nodes=splitted_idx["valid"])
         test_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//test_parts, input_nodes=splitted_idx["test"])
+    elif node_sampler == 'graphsaint':
+        train_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//train_parts, num_steps=train_parts)
+        val_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//val_parts, num_steps=val_parts)
+        test_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//test_parts, num_steps=test_parts)
     else:
         train_loader = RandomNodeLoader(data, num_parts=train_parts, shuffle=True)
         val_loader = RandomNodeLoader(data, num_parts=val_parts, shuffle=False)
         test_loader = RandomNodeLoader(data, num_parts=test_parts, shuffle=False)
 
     # Initialize the model
-    if mode == 'sparse':
+    if mode == 'dropedge':
+        model = DropoutGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
+    elif mode == 'sparse':
         model = GumbelGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
     else:
         model = NormalGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
@@ -85,7 +90,10 @@ def train_eval(
     ], lr)
 
     # Save path
-    if mode == 'sparse':
+    if mode == 'dropedge':
+        os.makedirs('./models/dropedge_wts/', exist_ok=True)
+        save_path = './models/dropedge_wts/'
+    elif mode == 'sparse':
         os.makedirs('./models/sparse_wts/', exist_ok=True)
         save_path = './models/sparse_wts/'
     else:
@@ -106,6 +114,9 @@ def train_eval(
         pbar.set_description(f'Training epoch: {epoch:03d}')
 
         train_total_loss = train_total_examples = 0
+        
+        if mode == 'dropedge':
+            data.edge_index, _ = dropout_edge(data.edge_index, dropout_ratio)
 
         # Iterate over the training data
         for data in train_loader:

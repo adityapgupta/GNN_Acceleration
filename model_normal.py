@@ -70,6 +70,6 @@ class NormalGCN(nn.Module):
         x = self.conv(x, edge_index, edge_attr, training = training)
         x = F.relu(x)
         x = self.fc(x)
-        x = x[node_mask!=0]
+        x = x[node_mask != 0]
 
         return x
