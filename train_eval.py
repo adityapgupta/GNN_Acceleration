@@ -1,12 +1,18 @@
+import os
 import torch
-from ogb.nodeproppred import PygNodePropPredDataset
+
 from tqdm import tqdm
-from torch_geometric.loader import RandomNodeLoader, GraphSAINTNodeSampler
+from sklearn.metrics import roc_auc_score
+from ogb.nodeproppred import PygNodePropPredDataset
+
 from torch_geometric.utils import scatter
+from torch_geometric.loader import GraphSAINTNodeSampler, NeighborLoader, RandomNodeLoader
+
 from model_sparse import GumbelGCN
 from model_normal import NormalGCN
-from sklearn.metrics import roc_auc_score
+
 torch.manual_seed(0)
+
 
 def train_eval(
     data_dir='./data', 
@@ -57,6 +63,10 @@ def train_eval(
         train_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//train_parts, num_steps=train_parts)
         val_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//val_parts, num_steps=val_parts)
         test_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//test_parts, num_steps=test_parts)
+    elif node_sampler == 'GraphSage':
+        train_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//train_parts, input_nodes=splitted_idx["train"])
+        val_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//val_parts, input_nodes=splitted_idx["valid"])
+        test_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//test_parts, input_nodes=splitted_idx["test"])
     else:
         train_loader = RandomNodeLoader(data, num_parts=train_parts, shuffle=True)
         val_loader = RandomNodeLoader(data, num_parts=val_parts, shuffle=False)
@@ -76,8 +86,10 @@ def train_eval(
 
     # Save path
     if mode == 'sparse':
+        os.makedirs('./models/sparse_wts/', exist_ok=True)
         save_path = './models/sparse_wts/'
     else:
+        os.makedirs('./models/normal_wts/', exist_ok=True)
         save_path = './models/normal_wts/'
 
     # Define the loss function
@@ -227,4 +239,3 @@ def train_eval(
 
     print(f'Test ROC AUC: {test_total / test_total_examples:.4f}')
     torch.cuda.empty_cache()
-

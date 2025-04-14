@@ -1,6 +1,8 @@
-import argparse
-from train_eval import train_eval
 import torch
+import argparse
+
+from train_eval import train_eval
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
