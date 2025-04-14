@@ -1,7 +1,7 @@
 import torch
 from ogb.nodeproppred import PygNodePropPredDataset
 from tqdm import tqdm
-from torch_geometric.loader import RandomNodeLoader
+from torch_geometric.loader import RandomNodeLoader, GraphSAINTNodeSampler
 from torch_geometric.utils import scatter
 from model_sparse import GumbelGCN
 from model_normal import NormalGCN
@@ -11,6 +11,7 @@ torch.manual_seed(0)
 def train_eval(
     data_dir='./data', 
     mode='sparse',
+    node_sampler='GraphSAINT',
     train_parts=100, 
     val_parts=25, 
     test_parts=25, 
@@ -52,9 +53,14 @@ def train_eval(
     data['test_mask'] = mask
 
     # Create data loaders
-    train_loader = RandomNodeLoader(data, num_parts=train_parts, shuffle=True)
-    val_loader = RandomNodeLoader(data, num_parts=val_parts, shuffle=False)
-    test_loader = RandomNodeLoader(data, num_parts=test_parts, shuffle=False)
+    if node_sampler == 'GraphSAINT':
+        train_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//train_parts)
+        val_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//val_parts)
+        test_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//test_parts)
+    else:
+        train_loader = RandomNodeLoader(data, num_parts=train_parts, shuffle=True)
+        val_loader = RandomNodeLoader(data, num_parts=val_parts, shuffle=False)
+        test_loader = RandomNodeLoader(data, num_parts=test_parts, shuffle=False)
 
     # Initialize the model
     if mode == 'sparse':
@@ -70,9 +76,9 @@ def train_eval(
 
     # Save path
     if mode == 'sparse':
-        save_path = './sparse_wts/'
+        save_path = '.models/sparse_wts/'
     else:
-        save_path = './normal_wts/'
+        save_path = '.models/normal_wts/'
 
     # Define the loss function
     criterion = torch.nn.BCEWithLogitsLoss()
