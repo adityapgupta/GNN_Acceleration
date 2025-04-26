@@ -202,6 +202,8 @@ def train_eval(
     # Test the model
     if sparse == 'neural':
         model = GumbelGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
+    elif sparse == 'dropedge':
+        model = DropoutGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
     else:
         model = NormalGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
 
