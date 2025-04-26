@@ -46,7 +46,7 @@ The results of the comparative study are given in the following table:
 | DropEdge           | GraphSAGE        | 44.0 | 19.5 | 41.8 | 19.3 | 6778 | 2560 |
 | DropEdge           | GraphSAINT       | 47.2 | 21.2 | 23.9 | 9.3 | 7391 | 849 |
 | NeuralSparse       | Uniformly Random | 36.5 | 14.2 | 27.4 | 16.4 | 3074 | 1639 |
-| NeuralSparse       | GraphSAGE        | 38.9 | 16.0 | 48.9 | 21.6 | 8202 | 2955 |
+| NeuralSparse       | GraphSAGE        | 38.9 | 16.0 | 24.9 | 13.4 | 6802 | 2955 |
 | NeuralSparse       | GraphSAINT       | 36.8 | 14.6 | 22.9 | 9.1 | 7713 | 1943 |
 
 
@@ -60,5 +60,5 @@ The results of the comparative study are given in the following table:
 | DropEdge           | GraphSAGE        | 28.2 | 38 | 74.76 | 19553.45 |
 | DropEdge           | GraphSAINT       | 1.8  | 31 | 70.53 | **39.01** |
 | NeuralSparse       | Uniformly Random | 106.2| 25 | 76.46 | 81455.40 |
-| NeuralSparse       | GraphSAGE        | 84.1 | 19 | 77.34 | 46030.04 |
+| NeuralSparse       | GraphSAGE        | 84.1 | 19 | 77.34 | 29008.15 |
 | NeuralSparse       | GraphSAINT       | 57.1 | 37 | **79.17** | 46494.81 |
