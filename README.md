@@ -36,7 +36,7 @@ This study aims to provide insights into the efficiency and performance trade-of
 ### Results
 The results of the comparative study are given in the following table:
 
-**TABLE I**: Machine Statistics while Training
+**TABLE I**: System parameters while training
 | **Sparsification** <br> **Method** | **Sampling** <br> **Method** | **CPU** <br> **Usage (%)** | **CPU** <br> **Power (W)** | **GPU** <br> **Usage (%)** | **GPU** <br> **Power (W)** | **RAM** <br> **(MB)** | **vRAM** <br> **(MB)** |
 |:----------------------------------:|:----------------------------:|:--------------------------:|:--------------------------:|:--------------------------:|:--------------------------:|:---------------------:|:----------------------:|
 | None               | Uniformly Random | 29.6 | 10.2 | 4.3 | 5.5 | 4212 | 1450 |
@@ -50,7 +50,7 @@ The results of the comparative study are given in the following table:
 | NeuralSparse       | GraphSAINT       | 36.8 | 14.6 | 22.9 | 9.1 | 7713 | 1943 |
 
 
-**TABLE II**: Training Statistics
+**TABLE II**: Training results
 | **Sparsification** <br> **Method** | **Sampling** <br> **Method** | **Time per** <br> **Epoch (s)** | **Number of** <br> **Epochs** | **ROC** <br> **AUC (%)** | **EDP (W min²)** |
 |:----------------------------------:|:----------------------------:|:---------------------------:|:----------------------------:|:--------------------:|:----------------:|
 | None               | Uniformly Random | 18.1 | 49 | 66.56 | 3605.21 |
