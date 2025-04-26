@@ -39,7 +39,7 @@ The results of the comparative study are given in the following table:
 **TABLE I**: System parameters while training
 | **Sparsification** <br> **Method** | **Sampling** <br> **Method** | **CPU** <br> **Usage (%)** | **CPU** <br> **Power (W)** | **GPU** <br> **Usage (%)** | **GPU** <br> **Power (W)** | **RAM** <br> **(MB)** | **vRAM** <br> **(MB)** |
 |:----------------------------------:|:----------------------------:|:--------------------------:|:--------------------------:|:--------------------------:|:--------------------------:|:---------------------:|:----------------------:|
-| None               | Uniformly Random | 29.6 | 10.2 | 4.3 | 5.5 | 4212 | 1450 |
+| None               | Uniformly Random | 29.6 | 10.2 | 6.3 | 4.3 | 4212 | 1450 |
 | None               | GraphSAGE        | 40.9 | 18.6 | 15.6 | 5.0 | 6481 | 433 |
 | None               | GraphSAINT       | 45.0 | 20.1 | 23.7 | 9.8 | 7121 | 1055 |
 | DropEdge           | Uniformly Random | 40.3 | 18.0 | 42.8 | 20.0 | 3141 | 3388 |
