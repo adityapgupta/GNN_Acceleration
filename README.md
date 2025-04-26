@@ -1,14 +1,22 @@
 # GNN Acceleration
 
-This project presents a comparative study of Graph Neural Network (GNN) acceleration techniques. We explore and evaluate two sampling methods and two sparsification methods:
+This project presents a comparative study of Graph Neural Network (GNN) acceleration techniques. We explore and evaluate two sparsification and two sampling methods:
+
+### Sparsification Methods
+- **DropEdge**
+- **NeuralSparse**
 
 ### Sampling Methods
 - **GraphSAGE**
 - **GraphSAINT**
 
-### Sparsification Methods
-- **DropEdge**
-- **NeuralSparse**
+### Usage
+To run any of the experiments, simply run the `main.py` file with the desired parameters. Specify the sparsification and sampling methods as command-line arguments with the `--sparse` and `--sample` flags, respectively. For example:
+```
+python main.py --sparse dropedge --sample graphsage
+```
+
+All available options can be found via the `--help` flag for `main.py`
 
 ### Evaluation Parameters
 The methods are compared based on the following parameters:

@@ -7,8 +7,8 @@ from train_eval import train_eval
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, default='./data', help='Directory for the dataset')
-    parser.add_argument('--mode', type=str, default='normal', help='Sparsification mode: normal, dropedge, sparse')
-    parser.add_argument('--node_sampler', type=str, default='random', help='Sampling method: random, graphsage, graphsaint')
+    parser.add_argument('--sparse', type=str, default='none', help='Sparsification mode: none, dropedge, neural')
+    parser.add_argument('--sample', type=str, default='random', help='Sampling method: random, graphsage, graphsaint')
     parser.add_argument('--train_parts', type=int, default=100, help='Number of training parts')
     parser.add_argument('--val_parts', type=int, default=25, help='Number of validation parts')
     parser.add_argument('--test_parts', type=int, default=25, help='Number of test parts')
@@ -27,8 +27,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     data_dir = args.data_dir
-    mode = args.mode
-    node_sampler = args.node_sampler
+    sparse = args.sparse
+    sample = args.sample
     train_parts = args.train_parts
     val_parts = args.val_parts
     test_parts = args.test_parts
@@ -47,8 +47,8 @@ if __name__ == "__main__":
 
     train_eval(
         data_dir, 
-        mode, 
-        node_sampler, 
+        sparse, 
+        sample, 
         train_parts, 
         val_parts, 
         test_parts, 

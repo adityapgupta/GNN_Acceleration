@@ -9,17 +9,17 @@ from torch_geometric.utils import scatter
 from torch_geometric.utils.dropout import dropout_edge
 from torch_geometric.loader import GraphSAINTNodeSampler, NeighborLoader, RandomNodeLoader
 
-from model_normal import NormalGCN
-from model_dropedge import DropoutGCN
-from model_sparse import GumbelGCN
+from sparsification.normal import NormalGCN
+from sparsification.dropedge import DropoutGCN
+from sparsification.sparse import GumbelGCN
 
 torch.manual_seed(0)
 
 
 def train_eval(
     data_dir='./data', 
-    mode='normal',
-    node_sampler='random',
+    sparse='none',
+    sample='random',
     train_parts=100, 
     val_parts=25, 
     test_parts=25, 
@@ -62,11 +62,11 @@ def train_eval(
     data['test_mask'] = mask
 
     # Create data loaders
-    if node_sampler == 'graphsage':
+    if sample == 'graphsage':
         train_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//train_parts, input_nodes=splitted_idx["train"])
         val_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//val_parts, input_nodes=splitted_idx["valid"])
         test_loader = NeighborLoader(data, num_neighbors=[10, 10], batch_size=data.num_nodes//test_parts, input_nodes=splitted_idx["test"])
-    elif node_sampler == 'graphsaint':
+    elif sample == 'graphsaint':
         train_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//train_parts, num_steps=train_parts)
         val_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//val_parts, num_steps=val_parts)
         test_loader = GraphSAINTNodeSampler(data, batch_size=data.num_nodes//test_parts, num_steps=test_parts)
@@ -76,30 +76,23 @@ def train_eval(
         test_loader = RandomNodeLoader(data, num_parts=test_parts, shuffle=False)
 
     # Initialize the model
-    if mode == 'dropedge':
+    if sparse == 'dropedge':
         model = DropoutGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
-    elif mode == 'sparse':
+    elif sparse == 'neural':
         model = GumbelGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
     else:
         model = NormalGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
+
+    # Save path
+    save_path = f"./models/{sparse}_{sample}/"
+    os.makedirs(save_path, exist_ok=True)
 
     # Set up the optimizer with weight decay for the first convolutional layer
     optimizer = torch.optim.Adam([
     {'params': model.conv.conv1.parameters(), 'weight_decay': weight_decay},
     {'params': [p for n, p in model.named_parameters() if 'conv.conv1' not in n], 'weight_decay': 0}
     ], lr)
-
-    # Save path
-    if mode == 'dropedge':
-        os.makedirs('./models/dropedge_wts/', exist_ok=True)
-        save_path = './models/dropedge_wts/'
-    elif mode == 'sparse':
-        os.makedirs('./models/sparse_wts/', exist_ok=True)
-        save_path = './models/sparse_wts/'
-    else:
-        os.makedirs('./models/normal_wts/', exist_ok=True)
-        save_path = './models/normal_wts/'
-
+    
     # Define the loss function
     criterion = torch.nn.BCEWithLogitsLoss()
 
@@ -115,7 +108,7 @@ def train_eval(
 
         train_total_loss = train_total_examples = 0
         
-        if mode == 'dropedge':
+        if sparse == 'dropedge':
             data.edge_index, _ = dropout_edge(data.edge_index, dropout_ratio)
 
         # Iterate over the training data
@@ -207,7 +200,7 @@ def train_eval(
     del model
 
     # Test the model
-    if mode == 'sparse':
+    if sparse == 'neural':
         model = GumbelGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
     else:
         model = NormalGCN(input_dim, output_dim, edge_feature_dim, k, device, hidden1, hidden2, temperature).to(device)
