@@ -34,7 +34,7 @@ The methods are compared based on the following parameters:
 This study aims to provide insights into the efficiency and performance trade-offs of different GNN acceleration techniques.
 
 ### Results
-The results of the comparative study are given in the following table:
+The results of the comparative study are given in the following tables. A full discussion of these results can be found in the report accompanying this project.
 
 **TABLE I**: System parameters while training
 | **Sparsification** <br> **Method** | **Sampling** <br> **Method** | **CPU** <br> **Usage (%)** | **CPU** <br> **Power (W)** | **GPU** <br> **Usage (%)** | **GPU** <br> **Power (W)** | **RAM** <br> **(MB)** | **vRAM** <br> **(MB)** |
@@ -42,9 +42,9 @@ The results of the comparative study are given in the following table:
 | None               | Uniformly Random | 29.6 | 10.2 | 6.3 | 4.3 | 4212 | 1450 |
 | None               | GraphSAGE        | 40.9 | 18.6 | 15.6 | 5.0 | 6481 | 433 |
 | None               | GraphSAINT       | 45.0 | 20.1 | 23.7 | 9.8 | 7121 | 1055 |
-| DropEdge           | Uniformly Random | 40.3 | 18.0 | 42.8 | 20.0 | 3141 | 3388 |
+| DropEdge           | Uniformly Random | 40.3 | 18.0 | 42.3 | 20.0 | 3141 | 3388 |
 | DropEdge           | GraphSAGE        | 44.0 | 19.5 | 41.8 | 19.3 | 6778 | 2560 |
-| DropEdge           | GraphSAINT       | 47.2 | 21.2 | 23.9 | 9.3 | 7391 | 849 |
+| DropEdge           | GraphSAINT       | 47.2 | 21.2 | 23.9 | 10.3 | 7391 | 849 |
 | NeuralSparse       | Uniformly Random | 36.5 | 14.2 | 27.4 | 16.4 | 3074 | 1639 |
 | NeuralSparse       | GraphSAGE        | 38.9 | 16.0 | 24.9 | 13.4 | 6802 | 2955 |
 | NeuralSparse       | GraphSAINT       | 36.8 | 14.6 | 22.9 | 9.1 | 7713 | 1943 |
