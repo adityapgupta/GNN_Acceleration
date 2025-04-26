@@ -43,7 +43,7 @@ The results of the comparative study are given in the following table:
 
 
 **TABLE II**: Training Statistics
-| **Sparsification** <br> **Method** | **Sampling** <br> **Method** | **Time per** <br> **Epoch (s)** | **Number of** <br> **Epochs** | **ROC** <br> **AUC** | **EDP (W min²)** |
+| **Sparsification** <br> **Method** | **Sampling** <br> **Method** | **Time per** <br> **Epoch (s)** | **Number of** <br> **Epochs** | **ROC** <br> **AUC (%)** | **EDP (W min²)** |
 |:----------------------------------:|:----------------------------:|:---------------------------:|:----------------------------:|:--------------------:|:----------------:|
 | None               | Uniformly Random | 18.1 | 49 | 66.56 | 3605.21 |
 | None               | GraphSAGE        | 14.7 | 29 | 68.27 | 1726.45 |
