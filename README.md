@@ -43,13 +43,12 @@ The results of the comparative study are given in the following table:
 
 
 **TABLE II**: Training Statistics
-| **Sparsification** <br> **Method** | **Sampling** <br> **Method** | **Time per** <br> **Epoch** | **Number of** <br> **Epochs** | **ROC** <br> **AUC** | **EDP** |
 | **Sparsification** <br> **Method** | **Sampling** <br> **Method** | **Time per** <br> **Epoch (s)** | **Number of** <br> **Epochs** | **ROC** <br> **AUC** | **EDP (W min²)** |
 |:----------------------------------:|:----------------------------:|:---------------------------:|:----------------------------:|:--------------------:|:----------------:|
 | None               | Uniformly Random | 18.1 | 49 | 66.56 | 3605.21 |
 | None               | GraphSAGE        | 14.7 | 29 | 68.27 | 1726.45 |
 | None               | GraphSAINT       | 1.4  | 45 | 72.23 | 48.29 |
-| DropEdge           | Uniformly Random | 36.4 | 17 | 64.15 | 6913.80 |
+| DropEdge           | Uniformly Random | 36.4 | 17 | 64.15 | 6945.62 |
 | DropEdge           | GraphSAGE        | 28.2 | 38 | 74.76 | 19553.45 |
 | DropEdge           | GraphSAINT       | 1.8  | 31 | 70.53 | **39.01** |
 | NeuralSparse       | Uniformly Random | 106.2| 25 | 76.46 | 81455.40 |
