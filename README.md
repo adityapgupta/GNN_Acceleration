@@ -16,7 +16,7 @@ To run any of the experiments, simply run the `main.py` file with the desired pa
 python main.py --sparse dropedge --sample graphsage
 ```
 
-All available options can be found via the `--help` flag for `main.py`
+All available options can be found via the `--help` flag for `main.py`.
 
 ### Evaluation Parameters
 The methods are compared based on the following parameters:
